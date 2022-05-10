@@ -13,6 +13,9 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User> {
+    if (!id) {
+      throw new NotFoundException('User Not Found!');
+    }
     const user = await this.repo.findOneBy({ id });
     return user;
   }
@@ -45,4 +48,4 @@ export class UsersService {
   }
 }
 
-//TODO: 10: custom
+//TODO: 10 13
