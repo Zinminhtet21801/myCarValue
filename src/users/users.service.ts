@@ -44,5 +44,3 @@ export class UsersService {
     return this.repo.remove(user);
   }
 }
-
-//TODO: 11 13
