@@ -63,20 +63,23 @@ describe('UsersController', () => {
     expect(user).toBeDefined();
   });
 
-  it('findUser throws an error if user with given id is not found', async () => {
+  it('findUser throws an error if user with given id is not found', async (done) => {
     fakeUsersService.findOne = () => null;
     try {
       await controller.findUser('1');
-    } catch (err) {}
+    } catch (err) {
+      done();
+    }
   });
 
   it('signin updates session object and returns user', async () => {
-    const session = { userId: 0 };
+    const session = { userId: -10 };
     const user = await controller.signin(
       { email: 'asdf@asdf.com', password: 'asdf' },
       session,
     );
-    expect(user.id).toBe(1);
+
+    expect(user.id).toEqual(1);
     expect(session.userId).toEqual(1);
   });
 });

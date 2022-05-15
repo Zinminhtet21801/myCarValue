@@ -1,13 +1,14 @@
 import { Test } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { User } from './user.entity';
 import { UsersService } from './users.service';
+import { User } from './user.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
   let fakeUsersService: Partial<UsersService>;
 
   beforeEach(async () => {
+    // Create a fake copy of the users service
     const users: User[] = [];
     fakeUsersService = {
       find: (email: string) => {
@@ -24,6 +25,7 @@ describe('AuthService', () => {
         return Promise.resolve(user);
       },
     };
+
     const module = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -37,55 +39,46 @@ describe('AuthService', () => {
     service = module.get(AuthService);
   });
 
-  it(`can create an instance of auth service`, async () => {
+  it('can create an instance of auth service', async () => {
     expect(service).toBeDefined();
   });
 
-  it('create a new user with a salted and hashed password', async () => {
+  it('creates a new user with a salted and hashed password', async () => {
     const user = await service.signup('asdf@asdf.com', 'asdf');
+
     expect(user.password).not.toEqual('asdf');
     const [salt, hash] = user.password.split('.');
     expect(salt).toBeDefined();
     expect(hash).toBeDefined();
   });
 
-  it('throws an error if user signs up with email that is already in use', async () => {
-    // fakeUsersService.find = () =>
-    //   Promise.resolve([{ id: 1, email: 'a', password: 'a' } as User]);
+  it('throws an error if user signs up with email that is in use', async (done) => {
     await service.signup('asdf@asdf.com', 'asdf');
     try {
       await service.signup('asdf@asdf.com', 'asdf');
-    } catch (err) {}
+    } catch (err) {
+      done();
+    }
   });
 
-  it('throws if signin is called with an unused email', async () => {
+  it('throws if signin is called with an unused email', async (done) => {
     try {
-      const a = await service.signin('asdflkj@asdflkj.com', 'passdflkj');
-      console.log(a);
-    } catch (err) {}
+      await service.signin('asdflkj@asdlfkj.com', 'passdflkj');
+    } catch (err) {
+      done();
+    }
   });
 
-  it('throws if an invalid password is provided', async () => {
-    // fakeUsersService.find = () =>
-    //   Promise.resolve([{ email: 'a@gmail.com', password: 'ab' } as User]);
-
-    await service.signup('las@dfl.com', 'dfkjsdaf');
-
+  it('throws if an invalid password is provided', async (done) => {
+    await service.signup('laskdjf@alskdfj.com', 'password');
     try {
-      await service.signin('las@dfl.com', 'dfkjsdaf');
-    } catch (err) {}
+      await service.signin('laskdjf@alskdfj.com', 'laksdlfkj');
+    } catch (err) {
+      done();
+    }
   });
 
   it('returns a user if correct password is provided', async () => {
-    // fakeUsersService.find = () =>
-    //   Promise.resolve([
-    //     {
-    //       email: 'j@gmail.com',
-    //       password:
-    //         '31576ec5795222a3.23d56b2645587c6972a207da771bf0ea63884e7d6e8e97affb3190443dccb8b7',
-    //     } as User,
-    //   ]);
-
     await service.signup('asdf@asdf.com', 'mypassword');
 
     const user = await service.signin('asdf@asdf.com', 'mypassword');
