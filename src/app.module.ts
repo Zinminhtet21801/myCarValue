@@ -1,43 +1,28 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import {
+  Module,
+  ValidationPipe,
+  MiddlewareConsumer,
+  DynamicModule,
+} from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Report } from './reports/report.entity';
-import { User } from './users/user.entity';
-import { APP_PIPE } from '@nestjs/core';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 const cookieSession = require('cookie-session');
 
 
 @Module({
   imports: [
-    ConfigModule.forRoot(
-      {
-        isGlobal: true,
-        envFilePath: `.env.${process.env.NODE_ENV}`,
-      }
-    ),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService)=>{
-        return {
-          type: 'sqlite',
-          database: config.get<string>('DB_NAME'),
-          entities: [Report, User],
-          synchronize: true,
-        }
-      }
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    // TypeOrmModule.forRoot({
-    //   type: 'sqlite',
-    //   database: process.env.NODE_ENV === 'test' ? 'test.sqlite' : 'db.sqlite',
-    //   entities: [Report, User],
-    //   synchronize: true,
-    // }),
-    ReportsModule,
+    TypeOrmModule.forRoot(),
     UsersModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [
@@ -51,11 +36,13 @@ const cookieSession = require('cookie-session');
   ],
 })
 export class AppModule {
+  constructor(private configService: ConfigService) {}
+
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
         cookieSession({
-          keys: ['secret'],
+          keys: [this.configService.get('COOKIE_KEY')],
         }),
       )
       .forRoutes('*');
