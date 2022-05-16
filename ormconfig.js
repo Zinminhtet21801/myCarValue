@@ -1,3 +1,10 @@
+var dotenv = require('dotenv');
+var fs = require('fs');
+var path = require('path');
+// var variable = fs.readFileSync(path.resolve(__dirname, '.env.production'),'utf8');
+// console.log(__dirname,dotenv.config({ path: '.env.production' }), variable);
+var  parsed  = dotenv.config({ path: '.env.production' })
+
 var dbConfig = {
   synchronize: false,
   migrations: ['migrations/*.js'],
@@ -34,7 +41,17 @@ switch (process.env.NODE_ENV) {
     });
     break;
   default:
-    throw new Error('unknown environment');
+    Object.assign(dbConfig, {
+      type: 'postgres',
+      url: parsed.parsed.DATABASE_URL,
+      migrationsRun: true,
+      entities: ['**/*.entity.js'],
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    });
+    break;
+  // throw new Error('unknown environment');
 }
 
 module.exports = dbConfig;
