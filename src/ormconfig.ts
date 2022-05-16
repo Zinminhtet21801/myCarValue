@@ -9,7 +9,6 @@ const { DataSource } = require('typeorm');
 //   database: process.env.NODE_ENV === 'test' ? 'test.sqlite' : 'db.sqlite',
 //   migrationsRun: process.env.NODE_ENV === 'test' ? true : false,
 // });
-console.log('here');
 
 const ormconfig = new DataSource({
   ...dbConfig
