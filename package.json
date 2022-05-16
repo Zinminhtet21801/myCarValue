@@ -22,6 +22,7 @@
     "typeorm": "typeorm-ts-node-commonjs -d src/ormconfig.ts"
   },
   "dependencies": {
+    "@nestjs/cli": "^8.2.5",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.0.0",
     "@nestjs/core": "^8.0.0",
@@ -44,7 +45,6 @@
     "typeorm": "^0.3.6"
   },
   "devDependencies": {
-    "@nestjs/cli": "^8.0.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
     "@types/express": "^4.17.13",
