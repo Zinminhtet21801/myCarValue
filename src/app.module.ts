@@ -13,13 +13,16 @@ import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
 const cookieSession = require('cookie-session');
 
-
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`,
-    }),
+    ConfigModule.forRoot(
+      process.env.NODE_ENV !== 'production'
+        ? {
+            isGlobal: true,
+            envFilePath: `.env.${process.env.NODE_ENV}`,
+          }
+        : {},
+    ),
     TypeOrmModule.forRoot(),
     UsersModule,
     ReportsModule,
