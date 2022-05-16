@@ -3,8 +3,7 @@ var fs = require('fs');
 var path = require('path');
 // var variable = fs.readFileSync(path.resolve(__dirname, '.env.production'),'utf8');
 // console.log(__dirname,dotenv.config({ path: '.env.production' }), variable);
-var  parsed  = dotenv.config({ path: '.env.production' })
-
+var parsed = dotenv.config({ path: '.env.production' });
 var dbConfig = {
   synchronize: false,
   migrations: ['migrations/*.js'],
@@ -53,5 +52,7 @@ switch (process.env.NODE_ENV) {
     break;
   // throw new Error('unknown environment');
 }
+
+console.log(process.env.NODE_ENV, dbConfig);
 
 module.exports = dbConfig;
